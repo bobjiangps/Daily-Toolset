@@ -74,7 +74,7 @@ class APP(wx.Frame):
         content_standard = self.load_file(file_standard)
         content_compare = self.load_file(file_compare)
         diff = difflib.HtmlDiff()
-        result = diff.make_file(content_standard, content_compare, file_standard, file_compare, context=True)
+        result = diff.make_file(content_standard, content_compare, file_standard.split(os.sep)[-1], file_compare.split(os.sep)[-1], context=True)
         with open(os.path.join(os.getcwd(), self.result_file), 'w') as rf:
             rf.write(result)
 
