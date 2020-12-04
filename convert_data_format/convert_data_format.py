@@ -1,5 +1,7 @@
+# -*- coding: UTF-8 -*-
 import wx
 import os
+import json
 
 
 class APP(wx.Frame):
@@ -49,7 +51,7 @@ class APP(wx.Frame):
         self.radio_box = wx.RadioBox(self.left_panel, choices=convert_type_list, majorDimension=1, style=wx.RA_SPECIFY_ROWS)
         self.left_box.Add(self.radio_box, flag=wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, border=1)
         self.convert_button = wx.Button(self.left_panel, pos=(300, 20), size=(80, 40), label="Convert")
-        self.convert_button.Bind(wx.EVT_BUTTON, self.show_text)
+        self.convert_button.Bind(wx.EVT_BUTTON, self.convert_data)
         self.left_box.Add(self.convert_button, flag=wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, border=1)
         self.convert_data_text = wx.TextCtrl(self.left_panel, style=wx.TE_MULTILINE, size=(300, 500))
         self.left_box.Add(self.convert_data_text, flag=wx.ALL | wx.EXPAND, border=10)
@@ -61,9 +63,18 @@ class APP(wx.Frame):
         self.right_box.Add(self.convert_result, flag=wx.ALL | wx.EXPAND, border=10)
         self.right_panel.SetSizerAndFit(self.right_box)
 
-    def show_text(self, e):
-        text = self.convert_data_text.GetValue()
-        self.convert_result.SetValue(text + self.radio_box.GetStringSelection())
+    def convert_data(self, e):
+        to_convert_text = self.convert_data_text.GetValue()
+        convert_type = self.radio_box.GetStringSelection()
+        if to_convert_text != "" and convert_type != "":
+            try:
+                if convert_type == "Format Json":
+                    result = json.dumps(json.loads(to_convert_text), indent=4, sort_keys=False, ensure_ascii=False)
+                self.convert_result.SetValue(result)
+            except Exception as err:
+                self.convert_result.SetValue("cannot convert data, please check the error message below:\n" + str(err))
+        else:
+            wx.MessageBox(message="No data or type to convert!", caption="Error", style=wx.OK | wx.ICON_ERROR)
         e.Skip()
 
     def exit_app(self, e):
@@ -75,7 +86,10 @@ class APP(wx.Frame):
         file_dialog.ShowModal()
         file_path = file_dialog.GetPath()
         with open(file_path, "r") as f:
-            self.convert_data_text.SetValue(f.read())
+            file_content = f.read()
+            self.convert_data_text.SetValue("")
+            self.convert_data_text.SetValue(file_content)
+            self.convert_result.SetValue("")
         e.Skip()
 
     def show_info(self, e):
