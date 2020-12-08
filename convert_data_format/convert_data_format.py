@@ -2,6 +2,7 @@
 import wx
 import os
 import json
+import yaml
 
 
 class APP(wx.Frame):
@@ -70,12 +71,16 @@ class APP(wx.Frame):
             try:
                 if convert_type == "Format Json":
                     result = json.dumps(json.loads(to_convert_text), indent=4, sort_keys=False, ensure_ascii=False)
+                elif convert_type == "Json to Yaml":
+                    result = yaml.safe_dump(json.loads(to_convert_text), default_flow_style=False, indent=2)
                 self.convert_result.SetValue(result)
             except Exception as err:
                 if str(err).find("Expecting property name enclosed in double quotes") >= 0:
                     try:
                         if convert_type == "Format Json":
                             result = json.dumps(json.loads(to_convert_text.replace("“", "\"").replace("”", "\"")), indent=4, sort_keys=False, ensure_ascii=False)
+                        elif convert_type == "Json to Yaml":
+                            result = yaml.safe_dump(json.loads(to_convert_text.replace("“", "\"").replace("”", "\"")), default_flow_style=False, indent=2)
                         self.convert_result.SetValue(result)
                     except Exception as err:
                         self.convert_result.SetValue("cannot convert data, please check the error message below:\n" + str(err))
