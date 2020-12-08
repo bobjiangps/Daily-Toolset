@@ -72,7 +72,15 @@ class APP(wx.Frame):
                     result = json.dumps(json.loads(to_convert_text), indent=4, sort_keys=False, ensure_ascii=False)
                 self.convert_result.SetValue(result)
             except Exception as err:
-                self.convert_result.SetValue("cannot convert data, please check the error message below:\n" + str(err))
+                if str(err).find("Expecting property name enclosed in double quotes") >= 0:
+                    try:
+                        if convert_type == "Format Json":
+                            result = json.dumps(json.loads(to_convert_text.replace("“", "\"").replace("”", "\"")), indent=4, sort_keys=False, ensure_ascii=False)
+                        self.convert_result.SetValue(result)
+                    except Exception as err:
+                        self.convert_result.SetValue("cannot convert data, please check the error message below:\n" + str(err))
+                else:
+                    self.convert_result.SetValue("cannot convert data, please check the error message below:\n" + str(err))
         else:
             wx.MessageBox(message="No data or type to convert!", caption="Error", style=wx.OK | wx.ICON_ERROR)
         e.Skip()
@@ -85,11 +93,13 @@ class APP(wx.Frame):
         file_dialog = wx.FileDialog(self, message="select single file", defaultDir=os.getcwd(), wildcard=files_filter, style=wx.FD_OPEN)
         file_dialog.ShowModal()
         file_path = file_dialog.GetPath()
+        self.convert_data_text.SetEditable(False)
         with open(file_path, "r") as f:
             file_content = f.read()
             self.convert_data_text.SetValue("")
             self.convert_data_text.SetValue(file_content)
             self.convert_result.SetValue("")
+        self.convert_data_text.SetEditable(True)
         e.Skip()
 
     def show_info(self, e):
