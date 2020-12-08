@@ -1,5 +1,9 @@
+altgraph==0.17
+macholib==1.14
 numpy==1.19.4
 Pillow==8.0.1
+pyinstaller==4.1
+pyinstaller-hooks-contrib==2020.10
 PyYAML==5.3.1
 six==1.15.0
 wxPython==4.1.0
